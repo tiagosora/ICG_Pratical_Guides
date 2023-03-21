@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<!--
+
+		threejs_ex_03_01_models.html
+
+		J. Madeira - March 2021
+
+-->
+
+<head>
+
+	<title>three.js example 01 &mdash; Some Models</title>
+
+	<meta charset="utf-8">
+
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+	<style>
+		body {
+
+			background-color: #ffffff;
+
+			/* To use the complete page */
+
+			margin: 0px;
+
+			overflow: hidden;
+		}
+	</style>
+
+</head>
+
+<body>
+
+	<!-- The library --- Can be a local version -->
+
+	<script type="text/javascript" src="http://threejs.org/build/three.js"></script>
+
+	<!-- Javascript code that runs the Three.js example -->
+
+	<script type="text/javascript">
+
+		function createTree(deltaRadius, deltaHeight) {
+
+			// Creating a model by grouping basic geometries
+
+			// Cylinder centered at the origin
+
+			const cylinderRadius = 5* deltaRadius;
+
+			const cylinderHeight = 20* deltaHeight;
+
+			const cylinderGeometry = new THREE.CylinderGeometry(cylinderRadius, cylinderRadius, cylinderHeight, 32);
+
+			const redMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+
+			const cylinder = new THREE.Mesh(cylinderGeometry, redMaterial);
+
+			// Move base of the cylinder to y = 0
+
+			cylinder.position.y = cylinderHeight / 2.0;
+
+			// Cone
+
+			const baseConeRadius = 10* deltaRadius;
+
+			const coneHeight = 30* deltaHeight;
+
+			const coneGeometry = new THREE.ConeGeometry(baseConeRadius, coneHeight, 32);
+
+			const greenMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+
+			const cone = new THREE.Mesh(coneGeometry, greenMaterial);
+
+			// Move base of the cone to the top of the cylinder
+
+			cone.position.y = cylinderHeight + coneHeight / 2.0;
+
+			// Tree
+
+			cylinder.receiveShadow = true;
+			cone.castShadow = true;
+			cylinder.receiveShadow = true;
+			cone.castShadow = true;
+
+			var tree = new THREE.Group();
+
+			tree.add(cylinder);
+
+			tree.add(cone);
+
+			return tree;
+		}
+
+		// Once everything is loaded, run this function
+
+		function init() {
+
+			// The SCENE
+
+			var scene = new THREE.Scene();
+
+			// Plane Helper to represent the ZOX plane
+			// const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0));
+			// const planeHelper = new THREE.PlaneHelper(plane, 200, 0xaaaaaa);
+			// scene.add(planeHelper);
+			// planeHelper.receiveShadow = true;
+			
+			// The coordinate axes
+
+			var axes = new THREE.AxesHelper(15);
+
+			scene.add(axes);
+
+			// The GROUND plane
+
+			var planeGeometry = new THREE.PlaneGeometry(700, 700);
+			var planeMaterial = new THREE.MeshPhongMaterial({ color: 0x1BCC1E });
+			var plane = new THREE.Mesh(planeGeometry, planeMaterial);
+			plane.receiveShadow = true;
+
+			// Rotate and position the plane
+
+			plane.rotation.x = -0.5 * Math.PI; // TODO: What happens if you comment out this line of code?
+			plane.position.x = 15;
+			plane.position.y = 0;
+			plane.position.z = 0;
+
+			// Add to the scene
+
+			scene.add(plane);
+
+
+			// Adding models to the scene
+
+			var tree_1 = createTree(1,1);
+			tree_1.position.x = -50;
+			tree_1.position.z = -25;
+			
+			scene.add(tree_1);
+			
+			var tree_2 = createTree(1,2);
+			tree_2.position.x = 50;
+			tree_2.position.z = -25;
+			scene.add(tree_2);
+			
+			var tree_3 = createTree(1,0.8);
+			tree_3.position.x = 50;
+			tree_3.position.z = 25;
+
+			scene.add(tree_3);
+
+			var tree_4 = createTree(1.5,1);
+			tree_4.position.x = -50;
+			tree_4.position.z = 25;
+			scene.add(tree_4);
+
+
+			var tree_5 = createTree(2,1);
+			tree_5.position.x = 0;
+			tree_5.position.z = -75;
+			var g_tree_5 = new THREE.Object3D()
+			g_tree_5.position.set(0,0,0)
+			g_tree_5.add(tree_5)
+
+			scene.add(g_tree_5);
+
+			var tree_6 = createTree(1,0.5);
+			tree_6.position.x = 150;
+			tree_6.position.z = 0;
+			var g_tree_6 = new THREE.Object3D()
+			g_tree_6.position.set(0,0,0)
+			g_tree_6.add(tree_6)
+
+			scene.add(g_tree_6);
+
+			var tree_7 = createTree(1.5,2);
+			tree_7.position.x = -100;
+			tree_7.position.z = 0;
+			var g_tree_7 = new THREE.Object3D()
+			g_tree_7.position.set(0,0,0)
+			g_tree_7.add(tree_7)
+
+			scene.add(g_tree_7);
+
+			// The CAMERA --- A camera is added to the scene
+
+			// --- Where the viewer is and how he is looking at the scene
+
+			var camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 400);
+
+			camera.position.y = 50;
+
+			camera.position.z = 150;
+
+			// Point the camera to the center of the scene
+
+			camera.lookAt(scene.position);
+
+			scene.add(camera)
+
+			// A LIGHT
+
+			const spotLight = new THREE.SpotLight( 0xffffff );
+			spotLight.position.set( -100, 300, 100 );
+
+
+			spotLight.castShadow = true;
+
+			spotLight.shadowMapWidth = 2048;
+			spotLight.shadowMapHeight= 2048;
+
+			scene.add( spotLight );
+
+			// The RENDERER --- To display the scene on the Web page
+
+			var renderer = new THREE.WebGLRenderer({ antialias: true });
+
+			renderer.setClearColor(new THREE.Color(0xffffff));
+
+			renderer.setPixelRatio(window.devicePixelRatio);
+
+			renderer.setSize(window.innerWidth, window.innerHeight);
+
+			// SHADOW
+			renderer.shadowMap.enabled = true;
+			renderer.shadowMapType = THREE.PCFSoftShadowMap;
+
+			// Add the output of the renderer
+
+			document.body.appendChild(renderer.domElement);
+
+			// Render the scene
+
+			var step = 0;
+			// Update model features and render the scene
+			renderScene()
+
+			function renderScene() {
+				step += 0.02;
+				
+				tree_1.position.z += + (0.3 * (Math.sin(step)));
+
+				tree_2.position.x += + (0.3 * -(Math.sin(step)));
+
+				tree_3.position.x += + (0.3 * -(Math.sin(step)));
+				tree_3.position.z += + (0.3 * (Math.sin(step)));
+
+				tree_4.position.x += + (0.3 * (Math.sin(step)));
+				tree_4.position.z += + (0.3 * -(Math.sin(step)));
+
+				g_tree_5.rotation.y += 0.02
+				g_tree_6.rotation.y += 0.05
+				g_tree_7.rotation.y += -0.01
+
+				requestAnimationFrame(renderScene);
+				renderer.render(scene, camera);
+			}
+		}
+
+		window.onload = init
+
+	</script>
+
+</body>
+
+</html>

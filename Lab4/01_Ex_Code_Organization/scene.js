@@ -27,6 +27,35 @@ helper.render(sceneElements);
 // Create and insert in the scene graph the models of the 3D scene
 function load3DObjects(sceneGraph) {
 
+    function createTree(deltaRadius, deltaHeight) {
+        // Creating a model by grouping basic geometries
+        // Cylinder centered at the origin
+        const cylinderRadius = 0.25* deltaRadius;
+        const cylinderHeight = 1* deltaHeight;
+        const cylinderGeometry = new THREE.CylinderGeometry(cylinderRadius, cylinderRadius, cylinderHeight, 32);
+        const redMaterial = new THREE.MeshBasicMaterial({ color: "brown" });
+        const cylinder = new THREE.Mesh(cylinderGeometry, redMaterial);
+        // Move base of the cylinder to y = 0
+        cylinder.position.y = cylinderHeight / 2.0;
+        // Cone
+        const baseConeRadius = 0.5* deltaRadius;
+        const coneHeight = 2.5* deltaHeight;
+        const coneGeometry = new THREE.ConeGeometry(baseConeRadius, coneHeight, 32);
+        const greenMaterial = new THREE.MeshBasicMaterial({ color: "darkGreen" });
+        const cone = new THREE.Mesh(coneGeometry, greenMaterial);
+        // Move base of the cone to the top of the cylinder
+        cone.position.y = cylinderHeight + coneHeight / 2.0;
+        // Tree
+        cylinder.receiveShadow = true;
+        cone.castShadow = true;
+        cylinder.receiveShadow = true;
+        cone.castShadow = true;
+        var tree = new THREE.Group();
+        tree.add(cylinder);
+        tree.add(cone);
+        return tree;
+    }
+
     // ************************** //
     // Create a ground plane
     // ************************** //
@@ -92,5 +121,19 @@ function load3DObjects(sceneGraph) {
 
     // Set shadow property
     cylinderObject.castShadow = true;
+
+    // ************************** //
+    // Create a cylinder
+    // ************************** //
+    const tree = createTree(1,1);
+    sceneGraph.add(tree);
+
+    // Set position of the cylinder
+    // Move to the right and towards the camera
+    // The base of the cylinder is on the plane
+    tree.translateX(-0.5).translateY(-0.25).translateZ(-1.5);
+
+    // Set shadow property
+    tree.castShadow = true;
 }
 

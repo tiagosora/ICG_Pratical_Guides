@@ -32,7 +32,7 @@ requestAnimationFrame(computeFrame);
 window.addEventListener('resize', resizeWindow);
 
 //To keep track of the keyboard - WASD
-var keyD = false, keyA = false, keyS = false, keyW = false;
+var keyD = false, keyA = false, keyS = false, keyW = false, keyPlus = false, keyMinus = false, keyLeft = false, keyUp = false, keyDown = false, keyRight = false;
 document.addEventListener('keydown', onDocumentKeyDown, false);
 document.addEventListener('keyup', onDocumentKeyUp, false);
 
@@ -48,7 +48,21 @@ function resizeWindow(eventParam) {
 }
 
 function onDocumentKeyDown(event) {
+    console.log(event.keyCode)
+
     switch (event.keyCode) {
+        case 37: // <--
+            keyLeft = true;
+            break;
+        case 38: // /\
+            keyUp = true;
+            break;
+        case 40: // V
+            keyDown = true;
+            break;
+        case 39: // -->
+            keyRight = true;
+            break;
         case 68: //d
             keyD = true;
             break;
@@ -61,10 +75,31 @@ function onDocumentKeyDown(event) {
         case 87: //w
             keyW = true;
             break;
+        case 189: //-
+            keyMinus = true;
+            break;
+        case 109: //-
+            keyMinus = true;
+            break;
+        case 107: //+
+            keyPlus = true;
+            break;
     }
 }
 function onDocumentKeyUp(event) {
     switch (event.keyCode) {
+        case 37: // <--
+            keyLeft = false;
+            break;
+        case 38: // /\
+            keyUp = false;
+            break;
+        case 40: // V
+            keyDown = false;
+            break;
+        case 39: // -->
+            keyRight = false;
+            break;
         case 68: //d
             keyD = false;
             break;
@@ -76,6 +111,15 @@ function onDocumentKeyUp(event) {
             break;
         case 87: //w
             keyW = false;
+            break;
+        case 189: //-
+            keyMinus = false;
+            break;
+        case 109: //-
+            keyMinus = false;
+            break;
+        case 107: //+
+            keyPlus = false;
             break;
     }
 }
@@ -137,6 +181,10 @@ function load3DObjects(sceneGraph) {
     // Set shadow property
     sphereObject.castShadow = true;
 
+    // Name
+    sphereObject.name = "sphere";
+
+
 
     // ************************** //
     // Create a cylinder
@@ -153,12 +201,15 @@ function load3DObjects(sceneGraph) {
 
     // Set shadow property
     cylinderObject.castShadow = true;
+
+    // Name
+    cylinderObject.name = "cylinder";
 }
 
 // Displacement value
 
 var delta = 0.1;
-
+var sphereScale = 1
 var dispX = 0.2, dispZ = 0.2;
 
 function computeFrame(time) {
@@ -180,6 +231,8 @@ function computeFrame(time) {
     // CONTROLING THE CUBE WITH THE KEYBOARD
 
     const cube = sceneElements.sceneGraph.getObjectByName("cube");
+    const sphere = sceneElements.sceneGraph.getObjectByName("sphere");
+    const cylinder = sceneElements.sceneGraph.getObjectByName("cylinder");
 
     if (keyD && cube.position.x < 2.5) {
         cube.translateX(dispX);
@@ -192,6 +245,34 @@ function computeFrame(time) {
     }
     if (keyS && cube.position.z < 2.5) {
         cube.translateZ(dispZ);
+    }
+
+    if (keyRight && cylinder.position.x < 2.5) {
+        cylinder.translateX(dispX);
+    }
+    if (keyUp && cylinder.position.z > -2.5) {
+        cylinder.translateZ(-dispZ);
+    }
+    if (keyLeft && cylinder.position.x > -2.5) {
+        cylinder.translateX(-dispX);
+    }
+    if (keyDown && cylinder.position.z < 2.5) {
+        cylinder.translateZ(dispZ);
+    }
+
+
+    if (keyPlus){
+        sphereScale += 0.05;
+        cylinder.position.y = 0.75*sphereScale
+        cylinder.scale.set(sphereScale,sphereScale,sphereScale)
+        keyPlus = false;
+    }
+
+    if (keyMinus && sphereScale > 0){
+        sphereScale -= 0.05;
+        cylinder.position.y = 0.75*sphereScale
+        cylinder.scale.set(sphereScale,sphereScale,sphereScale)
+        keyMinus = false;
     }
 
     // Rendering

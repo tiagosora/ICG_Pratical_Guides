@@ -48,6 +48,7 @@ function load3DObjects(sceneGraph) {
     const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
     const cubeMaterial = new THREE.MeshPhongMaterial({ color: 'rgb(255,0,0)' });
     const cubeObject = new THREE.Mesh(cubeGeometry, cubeMaterial);
+    cubeObject.name = "cubeObject"
     sceneGraph.add(cubeObject);
 
     // Set position of the cube
@@ -66,12 +67,13 @@ function load3DObjects(sceneGraph) {
     const sphereGeometry = new THREE.SphereGeometry(0.5, 32, 32);
     const sphereMaterial = new THREE.MeshPhongMaterial({ color: 'rgb(180,180,255)' });
     const sphereObject = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    sphereObject.name = "sphereObject"
     sceneGraph.add(sphereObject);
 
     // Set position of the sphere
     // Move to the left and away from (0,0,0)
     // The sphere touches the plane
-    sphereObject.translateX(-1.2).translateY(0.5).translateZ(-0.5);
+    sphereObject.translateX(-1.5).translateY(0.5).translateZ(1);
 
     // Set shadow property
     sphereObject.castShadow = true;
@@ -83,6 +85,7 @@ function load3DObjects(sceneGraph) {
     const cylinderGeometry = new THREE.CylinderGeometry(0.2, 0.2, 1.5, 25, 1);
     const cylinderMaterial = new THREE.MeshPhongMaterial({ color: 'rgb(200,255,150)' });
     const cylinderObject = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
+    cylinderObject.name = "cylinderObject"
     sceneGraph.add(cylinderObject);
 
     // Set position of the cylinder
@@ -102,7 +105,10 @@ function computeFrame(time) {
 
     // Can extract an object from the scene Graph from its name
     const light = sceneElements.sceneGraph.getObjectByName("light");
-
+    const cylinderObject = sceneElements.sceneGraph.getObjectByName("cylinderObject");
+    const cubeObject = sceneElements.sceneGraph.getObjectByName("cubeObject");
+    const sphereObject = sceneElements.sceneGraph.getObjectByName("sphereObject");
+    
     // Apply a small displacement
 
     if (light.position.x >= 10) {
@@ -110,7 +116,12 @@ function computeFrame(time) {
     } else if (light.position.x <= -10) {
         delta *= -1;
     }
-    light.translateX(delta);
+    light.translateX(-delta);
+    light.translateZ(-delta);
+
+    cylinderObject.rotation.x += 0.01;
+    cubeObject.rotation.y += 0.01;
+    sphereObject.translateZ(delta*0.2);
 
     // Rendering
     helper.render(sceneElements);
